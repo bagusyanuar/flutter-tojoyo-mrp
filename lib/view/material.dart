@@ -13,6 +13,9 @@ class _MaterialUnitPageState extends State<MaterialUnitPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Bahan Baku"),
+      ),
       body: SafeArea(
         child: Container(),
       ),
