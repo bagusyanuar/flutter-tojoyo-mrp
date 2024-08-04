@@ -53,7 +53,9 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               CardMenu(
                 text: "Bahan Baku Masuk",
-                onCardTap: () {},
+                onCardTap: () {
+                  Navigator.pushNamed(context, "/material-in");
+                },
               ),
               CardMenu(
                 text: "Product Keluar",

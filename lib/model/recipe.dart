@@ -17,3 +17,25 @@ class RecipeModel {
     );
   }
 }
+
+class RecipeDetailModel {
+  int id;
+  String name;
+  int qty;
+  String unit;
+
+  RecipeDetailModel(
+      {required this.id,
+      required this.name,
+      required this.qty,
+      required this.unit});
+
+  factory RecipeDetailModel.fromJson(dynamic e) {
+    return RecipeDetailModel(
+      id: e['id'] as int,
+      name: e['material']['name'] as String,
+      qty: e['qty'] as int,
+      unit: e['material']['unit'] as String,
+    );
+  }
+}

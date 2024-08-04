@@ -17,6 +17,18 @@ class RecipeResponse {
   });
 }
 
+class RecipeDetailResponse {
+  bool error;
+  String message;
+  List<RecipeDetailModel> data;
+
+  RecipeDetailResponse({
+    required this.error,
+    required this.message,
+    required this.data,
+  });
+}
+
 Future<RecipeResponse> getRecipeList() async {
   RecipeResponse recipeResponse = RecipeResponse(
     error: true,
@@ -68,4 +80,60 @@ Future<RecipeResponse> getRecipeList() async {
     );
   }
   return recipeResponse;
+}
+
+Future<RecipeDetailResponse> getRecipeDetailList(int id) async {
+  RecipeDetailResponse recipeDetailResponse = RecipeDetailResponse(
+    error: true,
+    message: "internal server error",
+    data: [],
+  );
+  try {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final String? token = preferences.getString("token");
+    // final response = await Dio().get("$hostApiAddress/material",
+    //     options: Options(
+    //       headers: {
+    //         "Accept": "application/json",
+    //         "Authorization": "Bearer $token"
+    //       },
+    //     ));
+    // log(response.data.toString());
+    // List<dynamic> materialData = response.data['data'];
+    List<dynamic> recipeDetailData = [
+      {
+        "id": 1,
+        "name": "Product A",
+        "material": {"name": "Tepung Terigu", "unit": "gram"},
+        "qty": 250,
+      },
+      {
+        "id": 2,
+        "name": "Product B",
+        "material": {"name": "Telut", "unit": "pcs"},
+        "qty": 2,
+      },
+      {
+        "id": 3,
+        "name": "Product C",
+        "material": {"name": "Gula", "unit": "gram"},
+        "qty": 50,
+      },
+    ];
+    List<RecipeDetailModel> data =
+        recipeDetailData.map((e) => RecipeDetailModel.fromJson(e)).toList();
+    recipeDetailResponse = RecipeDetailResponse(
+      error: false,
+      message: "success",
+      data: data,
+    );
+  } on DioException catch (e) {
+    log("Error ${e.response}");
+    recipeDetailResponse = RecipeDetailResponse(
+      error: true,
+      message: "internal server error",
+      data: [],
+    );
+  }
+  return recipeDetailResponse;
 }

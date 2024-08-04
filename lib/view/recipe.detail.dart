@@ -1,37 +1,45 @@
 import 'dart:developer';
 
 import 'package:app_tojoyo_mrp/components/button/button.floating.cart.dart';
-import 'package:app_tojoyo_mrp/components/card/card.recipe.dart';
+import 'package:app_tojoyo_mrp/components/card/card.recipe.detail.dart';
 import 'package:app_tojoyo_mrp/controller/recipe.dart';
 import 'package:app_tojoyo_mrp/model/recipe.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/material.dart';
 
-class RecipePge extends StatefulWidget {
-  const RecipePge({Key? key}) : super(key: key);
+class RecipeDetailPage extends StatefulWidget {
+  const RecipeDetailPage({Key? key}) : super(key: key);
 
   @override
-  State<RecipePge> createState() => _RecipePgeState();
+  State<RecipeDetailPage> createState() => _RecipeDetailPageState();
 }
 
-class _RecipePgeState extends State<RecipePge> {
-  List<RecipeModel> dataRecipe = [];
+class _RecipeDetailPageState extends State<RecipeDetailPage> {
+  int productID = 0;
+  List<RecipeDetailModel> dataRecipeDetail = [];
 
   @override
   void initState() {
     // TODO: implement initState
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      int tmpProductID = ModalRoute.of(context)!.settings.arguments as int;
+      // log(productID.toString());
+      setState(() {
+        productID = tmpProductID;
+      });
+    });
     super.initState();
     _initPage();
-    log("check");
   }
 
   void _initPage() async {
-    RecipeResponse recipeResponse = await getRecipeList();
-    log(recipeResponse.message);
-    if (!recipeResponse.error) {
+    RecipeDetailResponse recipeDetailResponse =
+        await getRecipeDetailList(productID);
+    log(recipeDetailResponse.message);
+    if (!recipeDetailResponse.error) {
       setState(() {
-        dataRecipe = recipeResponse.data;
+        dataRecipeDetail = recipeDetailResponse.data;
       });
     }
   }
@@ -59,7 +67,7 @@ class _RecipePgeState extends State<RecipePge> {
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: Text(
-                      "Data Resep",
+                      "Data Resep Product A",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -79,22 +87,17 @@ class _RecipePgeState extends State<RecipePge> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: dataRecipe.map((e) {
-                                return CustomCardRecipe(
+                              children: dataRecipeDetail.map((e) {
+                                return CustomCardRecipeDetail(
                                   data: e,
-                                  onTap: (recipeModel) {
-                                    log(recipeModel.id.toString());
-                                    Navigator.pushNamed(
-                                        context, "/recipe-detail",
-                                        arguments: recipeModel.id);
-                                  },
+                                  onTap: (recipeDetailModel) {},
                                 );
                               }).toList(),
                             ),
                           ),
                         ),
                         onRefresh: () async {
-                          _initPage();
+                          // _initPage();
                         },
                       );
                     },
@@ -102,18 +105,18 @@ class _RecipePgeState extends State<RecipePge> {
                 ],
               ),
             ),
-            // Align(
-            //   alignment: Alignment.bottomRight,
-            //   child: Padding(
-            //     padding: const EdgeInsets.all(20),
-            //     child: ButtonFloatingCart(
-            //       qty: 0,
-            //       onTapCart: () {
-            //         Navigator.pushNamed(context, '/recipe-add');
-            //       },
-            //     ),
-            //   ),
-            // ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: ButtonFloatingCart(
+                  qty: 0,
+                  onTapCart: () {
+                    Navigator.pushNamed(context, '/recipe-detail-add');
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
