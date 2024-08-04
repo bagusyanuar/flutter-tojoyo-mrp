@@ -1,33 +1,37 @@
+import 'dart:developer';
+
 import 'package:app_tojoyo_mrp/components/button/button.floating.cart.dart';
-import 'package:app_tojoyo_mrp/components/card/card.material.dart';
-import 'package:app_tojoyo_mrp/controller/material.dart';
-import 'package:app_tojoyo_mrp/model/material.dart';
+import 'package:app_tojoyo_mrp/components/card/card.recipe.dart';
+import 'package:app_tojoyo_mrp/controller/recipe.dart';
+import 'package:app_tojoyo_mrp/model/recipe.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
-class MaterialUnitPage extends StatefulWidget {
-  const MaterialUnitPage({Key? key}) : super(key: key);
+class RecipePge extends StatefulWidget {
+  const RecipePge({Key? key}) : super(key: key);
 
   @override
-  State<MaterialUnitPage> createState() => _MaterialUnitPageState();
+  State<RecipePge> createState() => _RecipePgeState();
 }
 
-class _MaterialUnitPageState extends State<MaterialUnitPage> {
-  List<MaterialModel> dataMaterial = [];
+class _RecipePgeState extends State<RecipePge> {
+  List<RecipeModel> dataRecipe = [];
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _initPage();
+    log("check");
   }
 
   void _initPage() async {
-    MaterialResponse materialResponse = await getMaterialList();
-    if (!materialResponse.error) {
+    RecipeResponse recipeResponse = await getRecipeList();
+    log(recipeResponse.message);
+    if (!recipeResponse.error) {
       setState(() {
-        dataMaterial = materialResponse.data;
+        dataRecipe = recipeResponse.data;
       });
     }
   }
@@ -36,7 +40,7 @@ class _MaterialUnitPageState extends State<MaterialUnitPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Bahan Baku"),
+        title: const Text("Resep"),
       ),
       body: SafeArea(
         child: Stack(
@@ -53,7 +57,7 @@ class _MaterialUnitPageState extends State<MaterialUnitPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    "Data Bahan Baku",
+                    "Data Resep",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -72,8 +76,11 @@ class _MaterialUnitPageState extends State<MaterialUnitPage> {
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.start,
                               crossAxisAlignment: CrossAxisAlignment.start,
-                              children: dataMaterial.map((e) {
-                                return CustomCardMaterial(data: e);
+                              children: dataRecipe.map((e) {
+                                return CustomCardRecipe(
+                                  data: e,
+                                  onTap: (recipeModel) {},
+                                );
                               }).toList(),
                             ),
                           ),
@@ -94,7 +101,7 @@ class _MaterialUnitPageState extends State<MaterialUnitPage> {
                 child: ButtonFloatingCart(
                   qty: 0,
                   onTapCart: () {
-                    Navigator.pushNamed(context, '/material-add');
+                    Navigator.pushNamed(context, '/recipe-add');
                   },
                 ),
               ),

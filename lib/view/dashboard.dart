@@ -37,11 +37,15 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               CardMenu(
                 text: "Product",
-                onCardTap: () {},
+                onCardTap: () {
+                  Navigator.pushNamed(context, "/product");
+                },
               ),
               CardMenu(
                 text: "Resep",
-                onCardTap: () {},
+                onCardTap: () {
+                  Navigator.pushNamed(context, "/recipe");
+                },
               ),
               CardMenu(
                 text: "MRP",

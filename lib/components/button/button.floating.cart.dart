@@ -30,7 +30,7 @@ class ButtonFloatingCart extends StatelessWidget {
             ),
             child: const Center(
               child: Icon(
-                Icons.shopping_bag,
+                Icons.add,
                 color: Colors.brown,
                 size: 24,
               ),

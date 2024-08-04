@@ -1,10 +1,13 @@
 import 'package:app_tojoyo_mrp/view/dashboard.dart';
 import 'package:app_tojoyo_mrp/view/login.dart';
 import 'package:app_tojoyo_mrp/view/material-in.dart';
+import 'package:app_tojoyo_mrp/view/material.add.dart';
 import 'package:app_tojoyo_mrp/view/material.dart';
 import 'package:app_tojoyo_mrp/view/mrp.dart';
 import 'package:app_tojoyo_mrp/view/product-out.dart';
+import 'package:app_tojoyo_mrp/view/product.add.dart';
 import 'package:app_tojoyo_mrp/view/product.dart';
+import 'package:app_tojoyo_mrp/view/recipe.dart';
 import 'package:app_tojoyo_mrp/view/report-material-in.dart';
 import 'package:app_tojoyo_mrp/view/report-product-out.dart';
 import 'package:app_tojoyo_mrp/view/splash.dart';
@@ -31,7 +34,10 @@ class MyApp extends StatelessWidget {
         "/login": (context) => const LoginPage(),
         "/dashboard": (context) => const DashboardPage(),
         "/material": (context) => const MaterialUnitPage(),
+        "/material-add": (context) => const MaterialAddPage(),
         "/product": (context) => const ProductPage(),
+        "/product-add": (context) => const ProductAddPage(),
+        "/recipe": (context) => const RecipePge(),
         "/mrp": (context) => const MRPPage(),
         "/material-in": (context) => const MaterialInPage(),
         "/product-out": (context) => const ProductOutPage(),

@@ -23,7 +23,7 @@ class ButtonLoading extends StatelessWidget {
         height: 60,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
-          color: Colors.red,
+          color: Colors.brown,
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
