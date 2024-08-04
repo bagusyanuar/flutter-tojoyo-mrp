@@ -90,6 +90,18 @@ class _MaterialInPageState extends State<MaterialInPage> {
                 ],
               ),
             ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: ButtonFloatingCart(
+                  qty: 0,
+                  onTapCart: () {
+                    Navigator.pushNamed(context, '/material-in-add');
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),

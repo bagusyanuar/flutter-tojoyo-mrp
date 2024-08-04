@@ -49,7 +49,9 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               CardMenu(
                 text: "MRP",
-                onCardTap: () {},
+                onCardTap: () {
+                  Navigator.pushNamed(context, "/mrp");
+                },
               ),
               CardMenu(
                 text: "Bahan Baku Masuk",
@@ -59,15 +61,21 @@ class _DashboardPageState extends State<DashboardPage> {
               ),
               CardMenu(
                 text: "Product Keluar",
-                onCardTap: () {},
+                onCardTap: () {
+                  Navigator.pushNamed(context, "/product-out");
+                },
               ),
               CardMenu(
                 text: "Laporan Bahan Baku Masuk",
-                onCardTap: () {},
+                onCardTap: () {
+                  Navigator.pushNamed(context, "/report-material-in");
+                },
               ),
               CardMenu(
                 text: "Laporan Product Keluar",
-                onCardTap: () {},
+                onCardTap: () {
+                  Navigator.pushNamed(context, "/report-product-out");
+                },
               ),
             ],
           ),
