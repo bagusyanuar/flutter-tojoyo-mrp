@@ -50,17 +50,12 @@ Future<RecipeResponse> getRecipeList() async {
     List<dynamic> recipeData = [
       {
         "id": 1,
-        "name": "Product A",
+        "name": "Dada Ayam Goreng",
         "count": 3,
       },
       {
         "id": 2,
-        "name": "Product B",
-        "count": 4,
-      },
-      {
-        "id": 3,
-        "name": "Product C",
+        "name": "Paha Ayam Goreng",
         "count": 3,
       },
     ];
@@ -103,21 +98,21 @@ Future<RecipeDetailResponse> getRecipeDetailList(int id) async {
     List<dynamic> recipeDetailData = [
       {
         "id": 1,
-        "name": "Product A",
-        "material": {"name": "Tepung Terigu", "unit": "gram"},
-        "qty": 250,
+        "name": "Dada Ayam Goreng",
+        "material": {"name": "Dada Ayam", "unit": "pc"},
+        "qty": 1,
       },
       {
         "id": 2,
         "name": "Product B",
-        "material": {"name": "Telut", "unit": "pcs"},
-        "qty": 2,
+        "material": {"name": "Tepung", "unit": "gram"},
+        "qty": 100,
       },
       {
         "id": 3,
         "name": "Product C",
-        "material": {"name": "Gula", "unit": "gram"},
-        "qty": 50,
+        "material": {"name": "Lengkuas", "unit": "pcs"},
+        "qty": 1,
       },
     ];
     List<RecipeDetailModel> data =

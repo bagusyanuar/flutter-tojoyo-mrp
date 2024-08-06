@@ -5,6 +5,7 @@ import 'package:app_tojoyo_mrp/model/product-out.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:intl/intl.dart';
 
 class ProductOutPage extends StatefulWidget {
   const ProductOutPage({Key? key}) : super(key: key);
@@ -15,6 +16,26 @@ class ProductOutPage extends StatefulWidget {
 
 class _ProductOutPageState extends State<ProductOutPage> {
   List<ProductOutModel> dataProductOut = [];
+  DateTime selectedDateStart = DateTime.now();
+  TextEditingController _textDateStartController = TextEditingController();
+
+  Future<void> _selectDateStart(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDateStart,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDateStart) {
+      setState(() {
+        selectedDateStart = picked;
+      });
+      _textDateStartController
+        ..text = DateFormat.yMMMd().format(selectedDateStart)
+        ..selection = TextSelection.fromPosition(TextPosition(
+            offset: _textDateStartController.text.length,
+            affinity: TextAffinity.upstream));
+    }
+  }
 
   @override
   void initState() {
@@ -30,6 +51,13 @@ class _ProductOutPageState extends State<ProductOutPage> {
         dataProductOut = productOutResponse.data;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _textDateStartController.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,14 +80,38 @@ class _ProductOutPageState extends State<ProductOutPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
-                    child: Text(
-                      "Data Product Keluar Hari Ini",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Row(
+                      children: [
+                        const Text(
+                          "Data Product Keluar",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 50,
+                        ),
+                        Expanded(
+                          child: TextField(
+                            focusNode: AlwaysDisabledFocusNode(),
+                            controller: _textDateStartController,
+                            onTap: () {
+                              _selectDateStart(context);
+                            },
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              hintText: "Tanggal",
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const Divider(),
@@ -107,4 +159,9 @@ class _ProductOutPageState extends State<ProductOutPage> {
       ),
     );
   }
+}
+
+class AlwaysDisabledFocusNode extends FocusNode {
+  @override
+  bool get hasFocus => false;
 }

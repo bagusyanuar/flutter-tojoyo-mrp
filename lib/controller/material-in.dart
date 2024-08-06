@@ -39,20 +39,20 @@ Future<MaterialInResponse> getMaterialInList() async {
     List<dynamic> materialInData = [
       {
         "id": 1,
-        "material": {"name": "Tepung Terigu", "unit": "gram"},
-        "qty": 500,
+        "material": {"name": "Dada Ayam", "unit": "pcs"},
+        "qty": 3,
         "date": "2024-07-02",
       },
       {
         "id": 2,
-        "material": {"name": "Gula", "unit": "gram"},
-        "qty": 1500,
+        "material": {"name": "Lengkuas", "unit": "pcs"},
+        "qty": 10,
         "date": "2024-07-02",
       },
       {
         "id": 3,
-        "material": {"name": "Telur", "unit": "kg"},
-        "qty": 3,
+        "material": {"name": "Air", "unit": "Liter"},
+        "qty": 5,
         "date": "2024-07-02",
       },
     ];

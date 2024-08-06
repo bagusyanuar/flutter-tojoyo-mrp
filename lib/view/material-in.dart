@@ -5,6 +5,7 @@ import 'package:app_tojoyo_mrp/model/material-in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:intl/intl.dart';
 
 class MaterialInPage extends StatefulWidget {
   const MaterialInPage({Key? key}) : super(key: key);
@@ -15,6 +16,26 @@ class MaterialInPage extends StatefulWidget {
 
 class _MaterialInPageState extends State<MaterialInPage> {
   List<MaterialInModel> dataMaterialIn = [];
+  DateTime selectedDateStart = DateTime.now();
+  TextEditingController _textDateStartController = TextEditingController();
+
+  Future<void> _selectDateStart(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+        context: context,
+        initialDate: selectedDateStart,
+        firstDate: DateTime(2015, 8),
+        lastDate: DateTime(2101));
+    if (picked != null && picked != selectedDateStart) {
+      setState(() {
+        selectedDateStart = picked;
+      });
+      _textDateStartController
+        ..text = DateFormat.yMMMd().format(selectedDateStart)
+        ..selection = TextSelection.fromPosition(TextPosition(
+            offset: _textDateStartController.text.length,
+            affinity: TextAffinity.upstream));
+    }
+  }
 
   @override
   void initState() {
@@ -30,6 +51,13 @@ class _MaterialInPageState extends State<MaterialInPage> {
         dataMaterialIn = materialInResponse.data;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _textDateStartController.dispose();
+    super.dispose();
   }
 
   @override
@@ -52,14 +80,39 @@ class _MaterialInPageState extends State<MaterialInPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
-                    child: Text(
-                      "Data Bahan Baku Masuk Hari Ini",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Data Bahan Baku Masuk",
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(
+                          width: 50,
+                        ),
+                        Expanded(
+                          child: TextField(
+                            focusNode: AlwaysDisabledFocusNode(),
+                            controller: _textDateStartController,
+                            onTap: () {
+                              _selectDateStart(context);
+                            },
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              contentPadding:
+                                  const EdgeInsets.symmetric(horizontal: 10),
+                              hintText: "Tanggal",
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const Divider(),
@@ -107,4 +160,9 @@ class _MaterialInPageState extends State<MaterialInPage> {
       ),
     );
   }
+}
+
+class AlwaysDisabledFocusNode extends FocusNode {
+  @override
+  bool get hasFocus => false;
 }

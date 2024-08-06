@@ -67,7 +67,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                   const Padding(
                     padding: EdgeInsets.symmetric(vertical: 20),
                     child: Text(
-                      "Data Resep Product A",
+                      "Data Resep Dada Ayam Goreng",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,

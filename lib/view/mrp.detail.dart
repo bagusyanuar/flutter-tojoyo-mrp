@@ -30,7 +30,7 @@ class _MRPDetailPageState extends State<MRPDetailPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("MRP Product"),
+        title: const Text("MRP Dada Goreng"),
       ),
       body: SafeArea(
         child: Stack(
@@ -95,8 +95,22 @@ class _MRPDetailPageState extends State<MRPDetailPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             children: [
+                                              Text("Dada Ayam"),
+                                              Text("4 pcs")
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin:
+                                              const EdgeInsets.only(bottom: 5),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
                                               Text("Tepung Terigu"),
-                                              Text("500 gram")
+                                              Text("1000 gram")
                                             ],
                                           ),
                                         ),
@@ -109,22 +123,8 @@ class _MRPDetailPageState extends State<MRPDetailPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             children: [
-                                              Text("Telur"),
-                                              Text("1 pcs")
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              const EdgeInsets.only(bottom: 5),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Text("Gula"),
-                                              Text("200 gram")
+                                              Text("Lengkuas"),
+                                              Text("20 pcs")
                                             ],
                                           ),
                                         ),
@@ -156,21 +156,7 @@ class _MRPDetailPageState extends State<MRPDetailPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             children: [
-                                              Text("Tepung Terigu"),
-                                              Text("300 gram")
-                                            ],
-                                          ),
-                                        ),
-                                        Container(
-                                          margin:
-                                              const EdgeInsets.only(bottom: 5),
-                                          child: Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.center,
-                                            children: [
-                                              Text("Telur"),
+                                              Text("Dada Ayam"),
                                               Text("1 pcs")
                                             ],
                                           ),
@@ -184,8 +170,22 @@ class _MRPDetailPageState extends State<MRPDetailPage> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.center,
                                             children: [
-                                              Text("Gula"),
-                                              Text("50 gram")
+                                              Text("Tepung Terigu"),
+                                              Text("100 gram")
+                                            ],
+                                          ),
+                                        ),
+                                        Container(
+                                          margin:
+                                              const EdgeInsets.only(bottom: 5),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            children: [
+                                              Text("Lengkuas"),
+                                              Text("1 pcs")
                                             ],
                                           ),
                                         ),
@@ -220,7 +220,7 @@ class _MRPDetailPageState extends State<MRPDetailPage> {
                           ),
                         ),
                         const Text(
-                          "10 PCS",
+                          "4 PCS",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 18,

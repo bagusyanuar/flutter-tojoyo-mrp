@@ -37,20 +37,20 @@ Future<ProductOutResponse> getProductOutList() async {
     List<dynamic> productOutData = [
       {
         "id": 1,
-        "product": {"name": "Product A", "unit": "gram"},
-        "qty": 10,
-        "date": "2024-07-02",
-      },
-      {
-        "id": 2,
-        "product": {"name": "Product B", "unit": "gram"},
+        "product": {"name": "Dada Ayam Goreng", "unit": "pcs"},
         "qty": 2,
         "date": "2024-07-02",
       },
       {
+        "id": 2,
+        "product": {"name": "Paha Ayam Goreng", "unit": "pcs"},
+        "qty": 1,
+        "date": "2024-07-02",
+      },
+      {
         "id": 3,
-        "product": {"name": "Product ", "unit": "kg"},
-        "qty": 3,
+        "product": {"name": "Paha Ayam Goreng ", "unit": "pcs"},
+        "qty": 10,
         "date": "2024-07-02",
       },
     ];
