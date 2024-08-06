@@ -37,21 +37,15 @@ Future<ProductResponse> getProductList() async {
     List<dynamic> productData = [
       {
         "id": 1,
-        "name": "Product A",
-        "qty": 15,
-        "unit": "gram",
-      },
-      {
-        "id": 2,
-        "name": "Product B",
-        "qty": 2,
+        "name": "Paha Ayam Goreng",
+        "qty": 10,
         "unit": "pcs",
       },
       {
-        "id": 3,
-        "name": "Product C",
-        "qty": 2,
-        "unit": "kg",
+        "id": 2,
+        "name": "Dada Ayam Goreng",
+        "qty": 5,
+        "unit": "pcs",
       },
     ];
     List<ProductModel> data =

@@ -38,21 +38,57 @@ Future<MaterialResponse> getMaterialList() async {
     List<dynamic> materialData = [
       {
         "id": 1,
-        "name": "Tepung Terigu",
-        "qty": 500,
-        "unit": "gram",
+        "name": "Dada Ayam",
+        "qty": 4,
+        "unit": "pcs",
       },
       {
         "id": 2,
-        "name": "Telur",
-        "qty": 35,
+        "name": "Paha Ayam",
+        "qty": 10,
         "unit": "pcs",
       },
       {
         "id": 3,
-        "name": "Gula",
+        "name": "Tepung Terigu",
+        "qty": 1000,
+        "unit": "gram",
+      },
+      {
+        "id": 4,
+        "name": "Kepala Ayam",
         "qty": 2,
-        "unit": "kg",
+        "unit": "pcs",
+      },
+      {
+        "id": 5,
+        "name": "Air",
+        "qty": 10,
+        "unit": "Liter",
+      },
+      {
+        "id": 6,
+        "name": "Garam",
+        "qty": 500,
+        "unit": "gram",
+      },
+      {
+        "id": 7,
+        "name": "Lengkuas",
+        "qty": 20,
+        "unit": "pcs",
+      },
+      {
+        "id": 8,
+        "name": "Sereh",
+        "qty": 10,
+        "unit": "batang",
+      },
+      {
+        "id": 9,
+        "name": "Daun Pandan",
+        "qty": 5,
+        "unit": "lembar",
       },
     ];
     List<MaterialModel> data =
