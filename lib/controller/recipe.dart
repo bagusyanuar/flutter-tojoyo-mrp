@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:app_tojoyo_mrp/controller/util.dart';
 import 'package:app_tojoyo_mrp/model/product.dart';
 import 'package:app_tojoyo_mrp/model/recipe.dart';
 import 'package:dio/dio.dart';
@@ -20,12 +21,24 @@ class RecipeResponse {
 class RecipeDetailResponse {
   bool error;
   String message;
+  RecipeModel? recipe;
   List<RecipeDetailModel> data;
 
   RecipeDetailResponse({
     required this.error,
     required this.message,
+    required this.recipe,
     required this.data,
+  });
+}
+
+class RecipeMutateResponse {
+  bool error;
+  String message;
+
+  RecipeMutateResponse({
+    required this.error,
+    required this.message,
   });
 }
 
@@ -38,27 +51,14 @@ Future<RecipeResponse> getRecipeList() async {
   try {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final String? token = preferences.getString("token");
-    // final response = await Dio().get("$hostApiAddress/material",
-    //     options: Options(
-    //       headers: {
-    //         "Accept": "application/json",
-    //         "Authorization": "Bearer $token"
-    //       },
-    //     ));
-    // log(response.data.toString());
-    // List<dynamic> materialData = response.data['data'];
-    List<dynamic> recipeData = [
-      {
-        "id": 1,
-        "name": "Dada Ayam Goreng",
-        "count": 3,
-      },
-      {
-        "id": 2,
-        "name": "Paha Ayam Goreng",
-        "count": 3,
-      },
-    ];
+    final response = await Dio().get("$hostApiAddress/recipe",
+        options: Options(
+          headers: {
+            "Accept": "application/json",
+            "Authorization": "Bearer $token"
+          },
+        ));
+    List<dynamic> recipeData = response.data['data'];
     List<RecipeModel> data =
         recipeData.map((e) => RecipeModel.fromJson(e)).toList();
     recipeResponse = RecipeResponse(
@@ -81,54 +81,104 @@ Future<RecipeDetailResponse> getRecipeDetailList(int id) async {
   RecipeDetailResponse recipeDetailResponse = RecipeDetailResponse(
     error: true,
     message: "internal server error",
+    recipe: null,
     data: [],
   );
   try {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final String? token = preferences.getString("token");
-    // final response = await Dio().get("$hostApiAddress/material",
-    //     options: Options(
-    //       headers: {
-    //         "Accept": "application/json",
-    //         "Authorization": "Bearer $token"
-    //       },
-    //     ));
-    // log(response.data.toString());
-    // List<dynamic> materialData = response.data['data'];
-    List<dynamic> recipeDetailData = [
-      {
-        "id": 1,
-        "name": "Dada Ayam Goreng",
-        "material": {"name": "Dada Ayam", "unit": "pc"},
-        "qty": 1,
-      },
-      {
-        "id": 2,
-        "name": "Product B",
-        "material": {"name": "Tepung", "unit": "gram"},
-        "qty": 100,
-      },
-      {
-        "id": 3,
-        "name": "Product C",
-        "material": {"name": "Lengkuas", "unit": "pcs"},
-        "qty": 1,
-      },
-    ];
-    List<RecipeDetailModel> data =
-        recipeDetailData.map((e) => RecipeDetailModel.fromJson(e)).toList();
+    final response = await Dio().get("$hostApiAddress/recipe/$id",
+        options: Options(
+          headers: {
+            "Accept": "application/json",
+            "Authorization": "Bearer $token"
+          },
+        ));
+    log(response.data.toString());
+    dynamic recipeData = response.data['data'] as dynamic;
+    RecipeModel? tmpRecipe;
+    List<RecipeDetailModel> data = [];
+    if (recipeData != null) {
+      tmpRecipe = RecipeModel.fromJsonDetail(recipeData);
+      List<dynamic> recipeListData = recipeData['product_material'];
+      data = recipeListData.map((e) => RecipeDetailModel.fromJson(e)).toList();
+    }
+
     recipeDetailResponse = RecipeDetailResponse(
       error: false,
       message: "success",
       data: data,
+      recipe: tmpRecipe,
     );
   } on DioException catch (e) {
     log("Error ${e.response}");
     recipeDetailResponse = RecipeDetailResponse(
-      error: true,
-      message: "internal server error",
-      data: [],
-    );
+        error: true, message: "internal server error", data: [], recipe: null);
   }
   return recipeDetailResponse;
+}
+
+Future<RecipeMutateResponse> addRecipe(
+    int productID, Map<String, dynamic> data) async {
+  RecipeMutateResponse recipeMutateResponse = RecipeMutateResponse(
+    error: true,
+    message: "internal server error",
+  );
+  try {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final String? token = preferences.getString("token");
+    var formData = FormData.fromMap(data);
+    final response = await Dio().post("$hostApiAddress/recipe/$productID",
+        options: Options(
+          headers: {
+            "Accept": "application/json",
+            "Authorization": "Bearer $token"
+          },
+        ),
+        data: formData);
+    log(response.data.toString());
+    recipeMutateResponse = RecipeMutateResponse(
+      error: false,
+      message: "success",
+    );
+  } on DioException catch (e) {
+    log("Error ${e.response}");
+    recipeMutateResponse = RecipeMutateResponse(
+      error: true,
+      message: "internal server error",
+    );
+  }
+  return recipeMutateResponse;
+}
+
+Future<RecipeMutateResponse> deleteRecipe(int recipeID) async {
+  RecipeMutateResponse recipeMutateResponse = RecipeMutateResponse(
+    error: true,
+    message: "internal server error",
+  );
+  try {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final String? token = preferences.getString("token");
+    final response = await Dio().delete(
+      "$hostApiAddress/recipe/$recipeID/delete",
+      options: Options(
+        headers: {
+          "Accept": "application/json",
+          "Authorization": "Bearer $token"
+        },
+      ),
+    );
+    log(response.data.toString());
+    recipeMutateResponse = RecipeMutateResponse(
+      error: false,
+      message: "success",
+    );
+  } on DioException catch (e) {
+    log("Error ${e.response}");
+    recipeMutateResponse = RecipeMutateResponse(
+      error: true,
+      message: "internal server error",
+    );
+  }
+  return recipeMutateResponse;
 }

@@ -4,12 +4,14 @@ import 'package:app_tojoyo_mrp/view/material-in.add.dart';
 import 'package:app_tojoyo_mrp/view/material-in.dart';
 import 'package:app_tojoyo_mrp/view/material.add.dart';
 import 'package:app_tojoyo_mrp/view/material.dart';
+import 'package:app_tojoyo_mrp/view/material.edit.dart';
 import 'package:app_tojoyo_mrp/view/mrp.dart';
 import 'package:app_tojoyo_mrp/view/mrp.detail.dart';
 import 'package:app_tojoyo_mrp/view/product-out.add.dart';
 import 'package:app_tojoyo_mrp/view/product-out.dart';
 import 'package:app_tojoyo_mrp/view/product.add.dart';
 import 'package:app_tojoyo_mrp/view/product.dart';
+import 'package:app_tojoyo_mrp/view/product.edit.dart';
 import 'package:app_tojoyo_mrp/view/recipe.dart';
 import 'package:app_tojoyo_mrp/view/recipe.detail.add.dart';
 import 'package:app_tojoyo_mrp/view/recipe.detail.dart';
@@ -40,8 +42,10 @@ class MyApp extends StatelessWidget {
         "/dashboard": (context) => const DashboardPage(),
         "/material": (context) => const MaterialUnitPage(),
         "/material-add": (context) => const MaterialAddPage(),
+        "/material-edit": (context) => const MaterialEditPage(),
         "/product": (context) => const ProductPage(),
         "/product-add": (context) => const ProductAddPage(),
+        "/product-edit": (context) => const ProductEditPage(),
         "/recipe": (context) => const RecipePge(),
         "/recipe-detail": (context) => const RecipeDetailPage(),
         "/recipe-detail-add": (context) => const RecipeDetailAddPage(),

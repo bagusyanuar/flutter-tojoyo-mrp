@@ -1,7 +1,9 @@
 import 'package:app_tojoyo_mrp/components/button/button-loading.dart';
+import 'package:app_tojoyo_mrp/controller/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MaterialAddPage extends StatefulWidget {
   const MaterialAddPage({Key? key}) : super(key: key);
@@ -14,6 +16,68 @@ class _MaterialAddPageState extends State<MaterialAddPage> {
   String name = '';
   String qty = '0';
   String unit = '';
+  bool isLoading = false;
+  TextEditingController _textNameController = TextEditingController();
+  TextEditingController _textUnitController = TextEditingController();
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _initPage();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _textNameController.dispose();
+    _textUnitController.dispose();
+    super.dispose();
+  }
+
+  void _initPage() {
+    _textNameController.text = '';
+    _textUnitController.text = '';
+  }
+
+  void _eventCreate() async {
+    Map<String, dynamic> data = {
+      "name": _textNameController.text,
+      "unit": _textUnitController.text,
+    };
+    setState(() {
+      isLoading = true;
+    });
+    MaterialMutateResponse materialMutateResponse = await createMaterial(data);
+    if (!materialMutateResponse.error) {
+      _textNameController.text = '';
+      _textUnitController.text = '';
+      setState(() {
+        isLoading = false;
+        name = '';
+        unit = '';
+      });
+      Fluttertoast.showToast(
+        msg: materialMutateResponse.message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: materialMutateResponse.message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,12 +120,13 @@ class _MaterialAddPageState extends State<MaterialAddPage> {
                             Container(
                               margin: const EdgeInsets.only(bottom: 10),
                               child: TextField(
-                                onChanged: (value) {
-                                  // onChanged(value);
-                                  setState(() {
-                                    name = value;
-                                  });
-                                },
+                                controller: _textNameController,
+                                // onChanged: (value) {
+                                //   // onChanged(value);
+                                //   setState(() {
+                                //     name = value;
+                                //   });
+                                // },
                                 decoration: InputDecoration(
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10),
@@ -82,12 +147,13 @@ class _MaterialAddPageState extends State<MaterialAddPage> {
                               ),
                             ),
                             TextField(
-                              onChanged: (value) {
-                                // onChanged(value);
-                                setState(() {
-                                  unit = value;
-                                });
-                              },
+                              controller: _textUnitController,
+                              // onChanged: (value) {
+                              //   // onChanged(value);
+                              //   setState(() {
+                              //     unit = value;
+                              //   });
+                              // },
                               decoration: InputDecoration(
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
@@ -108,9 +174,11 @@ class _MaterialAddPageState extends State<MaterialAddPage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: ButtonLoading(
-                  onLoading: false,
+                  onLoading: isLoading,
                   text: "Tambah Material",
-                  onTap: () {},
+                  onTap: () {
+                    _eventCreate();
+                  },
                 ),
               )
             ],

@@ -17,21 +17,26 @@ class RecipePge extends StatefulWidget {
 
 class _RecipePgeState extends State<RecipePge> {
   List<RecipeModel> dataRecipe = [];
+  bool isLoading = true;
+  bool isLoadingDelete = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _initPage();
-    log("check");
   }
 
   void _initPage() async {
+    setState(() {
+      isLoading = true;
+    });
     RecipeResponse recipeResponse = await getRecipeList();
     log(recipeResponse.message);
     if (!recipeResponse.error) {
       setState(() {
         dataRecipe = recipeResponse.data;
+        isLoading = false;
       });
     }
   }
@@ -74,24 +79,55 @@ class _RecipePgeState extends State<RecipePge> {
                         child: SizedBox(
                           height: height,
                           width: double.infinity,
-                          child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: dataRecipe.map((e) {
-                                return CustomCardRecipe(
-                                  data: e,
-                                  onTap: (recipeModel) {
-                                    log(recipeModel.id.toString());
-                                    Navigator.pushNamed(
-                                        context, "/recipe-detail",
-                                        arguments: recipeModel.id);
-                                  },
-                                );
-                              }).toList(),
-                            ),
-                          ),
+                          child: isLoading
+                              ? Container(
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  color: Colors.white,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        width: 20,
+                                        margin: const EdgeInsets.only(right: 5),
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.brown,
+                                        ),
+                                      ),
+                                      const Text(
+                                        "loading...",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.brown,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              : SingleChildScrollView(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: dataRecipe.map((e) {
+                                      return CustomCardRecipe(
+                                        data: e,
+                                        onTap: (recipeModel) {
+                                          log(recipeModel.id.toString());
+                                          Navigator.pushNamed(
+                                              context, "/recipe-detail",
+                                              arguments: recipeModel.id);
+                                        },
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
                         ),
                         onRefresh: () async {
                           _initPage();

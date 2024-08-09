@@ -13,7 +13,15 @@ class RecipeModel {
     return RecipeModel(
       id: e['id'] as int,
       name: e['name'] as String,
-      count: e['count'] as int,
+      count: e['count_recipe'] as int,
+    );
+  }
+
+  factory RecipeModel.fromJsonDetail(dynamic e) {
+    return RecipeModel(
+      id: e['id'] as int,
+      name: e['name'] as String,
+      count: 0,
     );
   }
 }

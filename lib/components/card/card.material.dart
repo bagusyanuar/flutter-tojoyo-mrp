@@ -5,45 +5,88 @@ import 'package:flutter/src/widgets/framework.dart';
 
 class CustomCardMaterial extends StatelessWidget {
   final MaterialModel data;
-  const CustomCardMaterial({Key? key, required this.data}) : super(key: key);
+  final Function(MaterialModel material) onTap;
+  final Function(MaterialModel material) onDelete;
+  const CustomCardMaterial({
+    Key? key,
+    required this.data,
+    required this.onTap,
+    required this.onDelete,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      margin: const EdgeInsets.only(bottom: 10),
-      height: 80,
-      width: double.infinity,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 1,
-            blurRadius: 4,
-            offset: const Offset(4, 4), // changes position of shadow
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            data.name,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
+    return GestureDetector(
+      onTap: () {
+        onTap(data);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(10),
+        margin: const EdgeInsets.only(bottom: 10),
+        height: 80,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(4, 4), // changes position of shadow
             ),
-          ),
-          Text(
-            "${data.qty} ${data.unit}",
-            style: const TextStyle(
-              fontSize: 14,
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Expanded(
+              child: Text(
+                data.name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-          ),
-        ],
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(bottom: 5),
+                  child: Text(
+                    "${data.qty} ${data.unit}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    onDelete(data);
+                  },
+                  child: Container(
+                    height: 30,
+                    width: 30,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.red,
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

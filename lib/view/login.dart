@@ -4,10 +4,13 @@ import 'package:app_tojoyo_mrp/components/button/button-loading.dart';
 import 'package:app_tojoyo_mrp/components/images/logo.dart';
 import 'package:app_tojoyo_mrp/components/textfield/icon-passwordfield.dart';
 import 'package:app_tojoyo_mrp/components/textfield/icon-textfield.dart';
+import 'package:app_tojoyo_mrp/controller/login.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({Key? key}) : super(key: key);
@@ -29,33 +32,50 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       onLoading = true;
     });
-    Navigator.pushNamedAndRemoveUntil(
-        context, "/dashboard", ModalRoute.withName("/dashboard"));
-    // LoginResponse loginResponse = await loginHandler(data);
-    // setState(() {
-    //   onLoading = false;
-    // });
-    // if (!loginResponse.error) {
-    //   log("show toast");
-    //   try {
-    //     SharedPreferences preferences = await SharedPreferences.getInstance();
-    //     preferences.setString("token", loginResponse.accessToken);
-    //   } catch (e) {
-    //     log(e.toString());
-    //   }
-    //   Navigator.pushNamedAndRemoveUntil(
-    //       context, "/home", ModalRoute.withName("/home"));
-    // } else {
-    //   Fluttertoast.showToast(
-    //     msg: loginResponse.message,
-    //     toastLength: Toast.LENGTH_SHORT,
-    //     gravity: ToastGravity.CENTER,
-    //     timeInSecForIosWeb: 1,
-    //     backgroundColor: Colors.red,
-    //     textColor: Colors.white,
-    //     fontSize: 16.0,
-    //   );
-    // }
+
+    LoginResponse loginResponse = await loginHandler(data);
+    setState(() {
+      onLoading = false;
+    });
+    if (!loginResponse.error) {
+      try {
+        SharedPreferences preferences = await SharedPreferences.getInstance();
+        preferences.setString("token", loginResponse.accessToken);
+        Fluttertoast.showToast(
+          msg: loginResponse.message,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      } catch (e) {
+        Fluttertoast.showToast(
+          msg: e.toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+
+      // ignore: use_build_context_synchronously
+      Navigator.pushNamedAndRemoveUntil(
+          context, "/dashboard", ModalRoute.withName("/dashboard"));
+    } else {
+      Fluttertoast.showToast(
+        msg: loginResponse.message,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
+    }
   }
 
   @override

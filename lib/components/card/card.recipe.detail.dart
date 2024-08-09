@@ -6,10 +6,14 @@ import 'package:flutter/src/widgets/framework.dart';
 class CustomCardRecipeDetail extends StatelessWidget {
   final RecipeDetailModel data;
   final Function(RecipeDetailModel recipeDetailModel) onTap;
+  final Function(RecipeDetailModel recipeDetailModel) onDelete;
 
-  const CustomCardRecipeDetail(
-      {Key? key, required this.data, required this.onTap})
-      : super(key: key);
+  const CustomCardRecipeDetail({
+    Key? key,
+    required this.data,
+    required this.onTap,
+    required this.onDelete,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -38,18 +42,49 @@ class CustomCardRecipeDetail extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              data.name,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+            Expanded(
+              child: Text(
+                data.name,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-            Text(
-              "${data.qty} ${data.unit}",
-              style: const TextStyle(
-                fontSize: 14,
-              ),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  margin: const EdgeInsets.only(bottom: 5),
+                  child: Text(
+                    "${data.qty} ${data.unit}",
+                    style: const TextStyle(
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    onDelete(data);
+                  },
+                  child: Container(
+                    height: 30,
+                    width: 30,
+                    decoration: const BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.red,
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.delete,
+                        color: Colors.white,
+                        size: 16,
+                      ),
+                    ),
+                  ),
+                )
+              ],
             ),
           ],
         ),
