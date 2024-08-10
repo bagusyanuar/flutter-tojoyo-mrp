@@ -1,9 +1,11 @@
 import 'package:app_tojoyo_mrp/components/button/button-loading.dart';
+import 'package:app_tojoyo_mrp/controller/product-out.dart';
 import 'package:app_tojoyo_mrp/controller/product.dart';
 import 'package:app_tojoyo_mrp/model/product.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ProductOutAddPage extends StatefulWidget {
   const ProductOutAddPage({Key? key}) : super(key: key);
@@ -16,20 +18,95 @@ class _ProductOutAddPageState extends State<ProductOutAddPage> {
   ProductModel? selectedProduct;
   List<ProductModel> dataProduct = [];
   String qty = '0';
+  String date = '';
+  bool isLoading = false;
+  bool isLoadingPage = true;
+  TextEditingController _textQtyController = TextEditingController();
 
   @override
   void initState() {
     // TODO: implement initState
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      String args = ModalRoute.of(context)!.settings.arguments as String;
+      setState(() {
+        date = args;
+      });
+    });
     super.initState();
     _initPage();
   }
 
   void _initPage() async {
+    setState(() {
+      isLoadingPage = true;
+    });
+    _textQtyController.text = '0';
     ProductResponse productResponse = await getProductList();
     if (!productResponse.error) {
       setState(() {
         dataProduct = productResponse.data;
+        isLoadingPage = false;
       });
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _textQtyController.dispose();
+    super.dispose();
+  }
+
+  void _eventAddProductOut() async {
+    if (selectedProduct != null) {
+      Map<String, dynamic> data = {
+        "date": date,
+        "product_id": selectedProduct!.id,
+        "qty": _textQtyController.text,
+      };
+      setState(() {
+        isLoading = true;
+      });
+      ProductOutMutateResponse productOutMutateResponse =
+          await addProductOut(data);
+      setState(() {
+        isLoading = false;
+      });
+      if (!productOutMutateResponse.error) {
+        _textQtyController.text = '0';
+        setState(() {
+          selectedProduct = null;
+        });
+        Fluttertoast.showToast(
+          msg: productOutMutateResponse.message,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      } else {
+        Fluttertoast.showToast(
+          msg: productOutMutateResponse.message,
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 1,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          fontSize: 16.0,
+        );
+      }
+    } else {
+      Fluttertoast.showToast(
+        msg: "silahkan memilih product..",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 16.0,
+      );
     }
   }
 
@@ -43,102 +120,129 @@ class _ProductOutAddPageState extends State<ProductOutAddPage> {
         child: SizedBox(
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    double height = constraints.maxHeight;
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 20, vertical: 10),
-                      height: height,
-                      width: double.infinity,
-                      child: SingleChildScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 5),
-                              child: const Text(
-                                "Pilih Product",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 10),
-                              child: DropdownButton<ProductModel>(
-                                isExpanded: true,
-                                elevation: 16,
-                                value: selectedProduct,
-                                items: dataProduct
-                                    .map<DropdownMenuItem<ProductModel>>(
-                                        (element) {
-                                  return DropdownMenuItem<ProductModel>(
-                                    value: element,
-                                    child: Text(element.name),
-                                  );
-                                }).toList(),
-                                onChanged: (value) {
-                                  setState(() {
-                                    selectedProduct = value;
-                                  });
-                                },
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 5),
-                              child: const Text(
-                                "Jumlah",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                ),
-                              ),
-                            ),
-                            Container(
-                              margin: const EdgeInsets.only(bottom: 10),
-                              child: TextField(
-                                onChanged: (value) {
-                                  // onChanged(value);
-                                  setState(() {
-                                    qty = value;
-                                  });
-                                },
-                                keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      horizontal: 10),
-                                  hintText: "Jumlah",
-                                ),
-                              ),
-                            ),
-                          ],
+          child: isLoadingPage
+              ? Container(
+                  height: MediaQuery.of(context).size.height,
+                  width: MediaQuery.of(context).size.width,
+                  color: Colors.white,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Container(
+                        height: 20,
+                        width: 20,
+                        margin: const EdgeInsets.only(right: 5),
+                        child: const CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Colors.brown,
                         ),
                       ),
-                    );
-                  },
+                      const Text(
+                        "loading...",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.brown,
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          double height = constraints.maxHeight;
+                          return Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 10),
+                            height: height,
+                            width: double.infinity,
+                            child: SingleChildScrollView(
+                              physics: const AlwaysScrollableScrollPhysics(),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 5),
+                                    child: const Text(
+                                      "Pilih Product",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    child: DropdownButton<ProductModel>(
+                                      isExpanded: true,
+                                      elevation: 16,
+                                      value: selectedProduct,
+                                      items: dataProduct
+                                          .map<DropdownMenuItem<ProductModel>>(
+                                              (element) {
+                                        return DropdownMenuItem<ProductModel>(
+                                          value: element,
+                                          child: Text(element.name),
+                                        );
+                                      }).toList(),
+                                      onChanged: (value) {
+                                        setState(() {
+                                          selectedProduct = value;
+                                        });
+                                      },
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 5),
+                                    child: const Text(
+                                      "Jumlah",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(bottom: 10),
+                                    child: TextField(
+                                      controller: _textQtyController,
+                                      keyboardType: TextInputType.number,
+                                      decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                        contentPadding:
+                                            const EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                        hintText: "Jumlah",
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 10),
+                      child: ButtonLoading(
+                        onLoading: isLoading,
+                        text: "Tambah Product Keluar",
+                        onTap: () {
+                          _eventAddProductOut();
+                        },
+                      ),
+                    )
+                  ],
                 ),
-              ),
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                child: ButtonLoading(
-                  onLoading: false,
-                  text: "Tambah Product Keluar",
-                  onTap: () {},
-                ),
-              )
-            ],
-          ),
         ),
       ),
     );

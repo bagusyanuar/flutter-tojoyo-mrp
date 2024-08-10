@@ -18,6 +18,7 @@ class _MaterialInPageState extends State<MaterialInPage> {
   List<MaterialInModel> dataMaterialIn = [];
   DateTime selectedDateStart = DateTime.now();
   TextEditingController _textDateStartController = TextEditingController();
+  bool isLoading = true;
 
   Future<void> _selectDateStart(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -30,10 +31,13 @@ class _MaterialInPageState extends State<MaterialInPage> {
         selectedDateStart = picked;
       });
       _textDateStartController
-        ..text = DateFormat.yMMMd().format(selectedDateStart)
-        ..selection = TextSelection.fromPosition(TextPosition(
-            offset: _textDateStartController.text.length,
-            affinity: TextAffinity.upstream));
+        ..text = DateFormat("yyyy-MM-dd").format(selectedDateStart)
+        ..selection = TextSelection.fromPosition(
+          TextPosition(
+              offset: _textDateStartController.text.length,
+              affinity: TextAffinity.upstream),
+        );
+      _initPage();
     }
   }
 
@@ -41,11 +45,31 @@ class _MaterialInPageState extends State<MaterialInPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _setDateNow();
     _initPage();
   }
 
+  void _setDateNow() {
+    DateTime now = DateTime.now();
+    setState(() {
+      selectedDateStart = now;
+    });
+    _textDateStartController
+      ..text = DateFormat("yyyy-MM-dd").format(selectedDateStart)
+      ..selection = TextSelection.fromPosition(TextPosition(
+          offset: _textDateStartController.text.length,
+          affinity: TextAffinity.upstream));
+  }
+
   void _initPage() async {
-    MaterialInResponse materialInResponse = await getMaterialInList();
+    setState(() {
+      isLoading = true;
+    });
+    String date = _textDateStartController.text;
+    MaterialInResponse materialInResponse = await getMaterialInList(date);
+    setState(() {
+      isLoading = false;
+    });
     if (!materialInResponse.error) {
       setState(() {
         dataMaterialIn = materialInResponse.data;
@@ -81,7 +105,7 @@ class _MaterialInPageState extends State<MaterialInPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
@@ -123,19 +147,50 @@ class _MaterialInPageState extends State<MaterialInPage> {
                         child: SizedBox(
                           height: height,
                           width: double.infinity,
-                          child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: dataMaterialIn.map((e) {
-                                return CustomCardMaterialIn(data: e);
-                              }).toList(),
-                            ),
-                          ),
+                          child: isLoading
+                              ? Container(
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  color: Colors.white,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        width: 20,
+                                        margin: const EdgeInsets.only(right: 5),
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.brown,
+                                        ),
+                                      ),
+                                      const Text(
+                                        "loading...",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.brown,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              : SingleChildScrollView(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: dataMaterialIn.map((e) {
+                                      return CustomCardMaterialIn(data: e);
+                                    }).toList(),
+                                  ),
+                                ),
                         ),
                         onRefresh: () async {
-                          // _initPage();
+                          _initPage();
                         },
                       );
                     },
@@ -147,12 +202,16 @@ class _MaterialInPageState extends State<MaterialInPage> {
               alignment: Alignment.bottomRight,
               child: Padding(
                 padding: const EdgeInsets.all(20),
-                child: ButtonFloatingCart(
-                  qty: 0,
-                  onTapCart: () {
-                    Navigator.pushNamed(context, '/material-in-add');
-                  },
-                ),
+                child: isLoading
+                    ? Container()
+                    : ButtonFloatingCart(
+                        qty: 0,
+                        onTapCart: () {
+                          String date = _textDateStartController.text;
+                          Navigator.pushNamed(context, '/material-in-add',
+                              arguments: date);
+                        },
+                      ),
               ),
             ),
           ],

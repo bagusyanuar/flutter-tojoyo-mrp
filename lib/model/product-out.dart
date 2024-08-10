@@ -19,7 +19,7 @@ class ProductOutModel {
       date: e['date'] as String,
       name: e['product']['name'] as String,
       qty: e['qty'] as int,
-      unit: e['product']['unit'] as String,
+      unit: "",
     );
   }
 }

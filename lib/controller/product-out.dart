@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:app_tojoyo_mrp/controller/util.dart';
 import 'package:app_tojoyo_mrp/model/product-out.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,7 +17,17 @@ class ProductOutResponse {
   });
 }
 
-Future<ProductOutResponse> getProductOutList() async {
+class ProductOutMutateResponse {
+  bool error;
+  String message;
+
+  ProductOutMutateResponse({
+    required this.error,
+    required this.message,
+  });
+}
+
+Future<ProductOutResponse> getProductOutList(String date) async {
   ProductOutResponse productOutResponse = ProductOutResponse(
     error: true,
     message: "internal server error",
@@ -25,35 +36,86 @@ Future<ProductOutResponse> getProductOutList() async {
   try {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     final String? token = preferences.getString("token");
-    // final response = await Dio().get("$hostApiAddress/material",
-    //     options: Options(
-    //       headers: {
-    //         "Accept": "application/json",
-    //         "Authorization": "Bearer $token"
-    //       },
-    //     ));
-    // log(response.data.toString());
-    // List<dynamic> materialData = response.data['data'];
-    List<dynamic> productOutData = [
-      {
-        "id": 1,
-        "product": {"name": "Dada Ayam Goreng", "unit": "pcs"},
-        "qty": 2,
-        "date": "2024-07-02",
-      },
-      {
-        "id": 2,
-        "product": {"name": "Paha Ayam Goreng", "unit": "pcs"},
-        "qty": 1,
-        "date": "2024-07-02",
-      },
-      {
-        "id": 3,
-        "product": {"name": "Paha Ayam Goreng ", "unit": "pcs"},
-        "qty": 10,
-        "date": "2024-07-02",
-      },
-    ];
+    final response = await Dio().get("$hostApiAddress/product-out?date=$date",
+        options: Options(
+          headers: {
+            "Accept": "application/json",
+            "Authorization": "Bearer $token"
+          },
+        ));
+    List<dynamic> productOutData = response.data['data'];
+    log(productOutData.toString());
+    List<ProductOutModel> data =
+        productOutData.map((e) => ProductOutModel.fromJson(e)).toList();
+    productOutResponse = ProductOutResponse(
+      error: false,
+      message: "success",
+      data: data,
+    );
+  } on DioException catch (e) {
+    log("Error ${e.response}");
+    productOutResponse = ProductOutResponse(
+      error: true,
+      message: "internal server error",
+      data: [],
+    );
+  }
+  return productOutResponse;
+}
+
+Future<ProductOutMutateResponse> addProductOut(
+    Map<String, dynamic> data) async {
+  ProductOutMutateResponse productOutMutateResponse = ProductOutMutateResponse(
+    error: true,
+    message: "internal server error",
+  );
+  try {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final String? token = preferences.getString("token");
+    var formData = FormData.fromMap(data);
+    final response = await Dio().post("$hostApiAddress/product-out",
+        options: Options(
+          headers: {
+            "Accept": "application/json",
+            "Authorization": "Bearer $token"
+          },
+        ),
+        data: formData);
+    log(response.data.toString());
+    productOutMutateResponse = ProductOutMutateResponse(
+      error: false,
+      message: "success",
+    );
+  } on DioException catch (e) {
+    log("Error ${e.response}");
+    productOutMutateResponse = ProductOutMutateResponse(
+      error: true,
+      message: e.response!.data["message"].toString(),
+    );
+  }
+  return productOutMutateResponse;
+}
+
+Future<ProductOutResponse> getReportProductOutList(
+    String start, String end) async {
+  ProductOutResponse productOutResponse = ProductOutResponse(
+    error: true,
+    message: "internal server error",
+    data: [],
+  );
+  try {
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    final String? token = preferences.getString("token");
+    final response = await Dio()
+        .get("$hostApiAddress/product-out-report?start=$start&end=$end",
+            options: Options(
+              headers: {
+                "Accept": "application/json",
+                "Authorization": "Bearer $token"
+              },
+            ));
+    List<dynamic> productOutData = response.data['data'];
+    log(productOutData.toString());
     List<ProductOutModel> data =
         productOutData.map((e) => ProductOutModel.fromJson(e)).toList();
     productOutResponse = ProductOutResponse(

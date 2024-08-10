@@ -19,6 +19,7 @@ class _ReportProductOutState extends State<ReportProductOut> {
   TextEditingController _textDateStartController = TextEditingController();
   TextEditingController _textDateEndController = TextEditingController();
   List<ProductOutModel> dataProductOut = [];
+  bool isLoading = true;
 
   Future<void> _selectDateStart(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -31,10 +32,13 @@ class _ReportProductOutState extends State<ReportProductOut> {
         selectedDateStart = picked;
       });
       _textDateStartController
-        ..text = DateFormat.yMMMd().format(selectedDateStart)
-        ..selection = TextSelection.fromPosition(TextPosition(
-            offset: _textDateStartController.text.length,
-            affinity: TextAffinity.upstream));
+        ..text = DateFormat("yyyy-MM-dd").format(selectedDateStart)
+        ..selection = TextSelection.fromPosition(
+          TextPosition(
+              offset: _textDateStartController.text.length,
+              affinity: TextAffinity.upstream),
+        );
+      _initPage();
     }
   }
 
@@ -49,10 +53,13 @@ class _ReportProductOutState extends State<ReportProductOut> {
         selectedDateEnd = picked;
       });
       _textDateEndController
-        ..text = DateFormat.yMMMd().format(selectedDateEnd)
-        ..selection = TextSelection.fromPosition(TextPosition(
-            offset: _textDateEndController.text.length,
-            affinity: TextAffinity.upstream));
+        ..text = DateFormat("yyyy-MM-dd").format(selectedDateEnd)
+        ..selection = TextSelection.fromPosition(
+          TextPosition(
+              offset: _textDateEndController.text.length,
+              affinity: TextAffinity.upstream),
+        );
+      _initPage();
     }
   }
 
@@ -68,11 +75,40 @@ class _ReportProductOutState extends State<ReportProductOut> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _setDateNow();
     _initPage();
   }
 
+  void _setDateNow() {
+    DateTime now = DateTime.now();
+    setState(() {
+      selectedDateStart = now;
+      selectedDateEnd = now;
+    });
+    _textDateStartController
+      ..text = DateFormat("yyyy-MM-dd").format(selectedDateStart)
+      ..selection = TextSelection.fromPosition(TextPosition(
+          offset: _textDateStartController.text.length,
+          affinity: TextAffinity.upstream));
+
+    _textDateEndController
+      ..text = DateFormat("yyyy-MM-dd").format(selectedDateEnd)
+      ..selection = TextSelection.fromPosition(TextPosition(
+          offset: _textDateEndController.text.length,
+          affinity: TextAffinity.upstream));
+  }
+
   void _initPage() async {
-    ProductOutResponse productOutResponse = await getProductOutList();
+    setState(() {
+      isLoading = true;
+    });
+    String start = _textDateStartController.text;
+    String end = _textDateEndController.text;
+    ProductOutResponse productOutResponse =
+        await getReportProductOutList(start, end);
+    setState(() {
+      isLoading = false;
+    });
     if (!productOutResponse.error) {
       setState(() {
         dataProductOut = productOutResponse.data;
@@ -163,16 +199,47 @@ class _ReportProductOutState extends State<ReportProductOut> {
                         child: SizedBox(
                           height: height,
                           width: double.infinity,
-                          child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: dataProductOut.map((e) {
-                                return CustomCardProductOut(data: e);
-                              }).toList(),
-                            ),
-                          ),
+                          child: isLoading
+                              ? Container(
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  color: Colors.white,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        width: 20,
+                                        margin: const EdgeInsets.only(right: 5),
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.brown,
+                                        ),
+                                      ),
+                                      const Text(
+                                        "loading...",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.brown,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              : SingleChildScrollView(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: dataProductOut.map((e) {
+                                      return CustomCardProductOut(data: e);
+                                    }).toList(),
+                                  ),
+                                ),
                         ),
                         onRefresh: () async {
                           _initPage();

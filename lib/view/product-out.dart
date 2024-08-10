@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app_tojoyo_mrp/components/button/button.floating.cart.dart';
 import 'package:app_tojoyo_mrp/components/card/card.product-out.dart';
 import 'package:app_tojoyo_mrp/controller/product-out.dart';
@@ -18,6 +20,7 @@ class _ProductOutPageState extends State<ProductOutPage> {
   List<ProductOutModel> dataProductOut = [];
   DateTime selectedDateStart = DateTime.now();
   TextEditingController _textDateStartController = TextEditingController();
+  bool isLoading = true;
 
   Future<void> _selectDateStart(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
@@ -31,21 +34,44 @@ class _ProductOutPageState extends State<ProductOutPage> {
       });
       _textDateStartController
         ..text = DateFormat.yMMMd().format(selectedDateStart)
-        ..selection = TextSelection.fromPosition(TextPosition(
-            offset: _textDateStartController.text.length,
-            affinity: TextAffinity.upstream));
+        ..selection = TextSelection.fromPosition(
+          TextPosition(
+              offset: _textDateStartController.text.length,
+              affinity: TextAffinity.upstream),
+        );
+      _initPage();
     }
+  }
+
+  void _setDateNow() {
+    DateTime now = DateTime.now();
+    setState(() {
+      selectedDateStart = now;
+    });
+    _textDateStartController
+      ..text = DateFormat("yyyy-MM-dd").format(selectedDateStart)
+      ..selection = TextSelection.fromPosition(TextPosition(
+          offset: _textDateStartController.text.length,
+          affinity: TextAffinity.upstream));
   }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    _setDateNow();
     _initPage();
   }
 
   void _initPage() async {
-    ProductOutResponse productOutResponse = await getProductOutList();
+    setState(() {
+      isLoading = true;
+    });
+    String date = _textDateStartController.text;
+    ProductOutResponse productOutResponse = await getProductOutList(date);
+    setState(() {
+      isLoading = false;
+    });
     if (!productOutResponse.error) {
       setState(() {
         dataProductOut = productOutResponse.data;
@@ -81,7 +107,7 @@ class _ProductOutPageState extends State<ProductOutPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 20),
+                    padding: const EdgeInsets.symmetric(vertical: 20),
                     child: Row(
                       children: [
                         const Text(
@@ -122,16 +148,47 @@ class _ProductOutPageState extends State<ProductOutPage> {
                         child: SizedBox(
                           height: height,
                           width: double.infinity,
-                          child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: dataProductOut.map((e) {
-                                return CustomCardProductOut(data: e);
-                              }).toList(),
-                            ),
-                          ),
+                          child: isLoading
+                              ? Container(
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  color: Colors.white,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        width: 20,
+                                        margin: const EdgeInsets.only(right: 5),
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.brown,
+                                        ),
+                                      ),
+                                      const Text(
+                                        "loading...",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.brown,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              : SingleChildScrollView(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: dataProductOut.map((e) {
+                                      return CustomCardProductOut(data: e);
+                                    }).toList(),
+                                  ),
+                                ),
                         ),
                         onRefresh: () async {
                           _initPage();
@@ -146,12 +203,16 @@ class _ProductOutPageState extends State<ProductOutPage> {
               alignment: Alignment.bottomRight,
               child: Padding(
                 padding: const EdgeInsets.all(20),
-                child: ButtonFloatingCart(
-                  qty: 0,
-                  onTapCart: () {
-                    Navigator.pushNamed(context, '/product-out-add');
-                  },
-                ),
+                child: isLoading
+                    ? Container()
+                    : ButtonFloatingCart(
+                        qty: 0,
+                        onTapCart: () {
+                          String date = _textDateStartController.text;
+                          Navigator.pushNamed(context, '/product-out-add',
+                              arguments: date);
+                        },
+                      ),
               ),
             ),
           ],
