@@ -1,3 +1,7 @@
+import 'dart:developer';
+import 'dart:io';
+
+import 'package:app_tojoyo_mrp/components/button/button-loading.dart';
 import 'package:app_tojoyo_mrp/components/button/button.floating.cart.dart';
 import 'package:app_tojoyo_mrp/components/card/card.material-in.dart';
 import 'package:app_tojoyo_mrp/controller/material-in.dart';
@@ -5,7 +9,13 @@ import 'package:app_tojoyo_mrp/model/material-in.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
+
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class ReportMaterialInPage extends StatefulWidget {
   const ReportMaterialInPage({Key? key}) : super(key: key);
@@ -117,6 +127,69 @@ class _ReportMaterialInPageState extends State<ReportMaterialInPage> {
     }
   }
 
+  Future<void> _requestPermission() async {
+    var status = await Permission.storage.status;
+    if (!status.isGranted) {
+      await Permission.storage.request();
+    }
+  }
+
+  Future<void> _createPdf() async {
+    await _requestPermission();
+    final pdf = pw.Document();
+
+    final headers = ["Tanggal", "Nama", "Qty"];
+
+    List<List<String>> data = [];
+
+    for (var element in dataMaterialIn) {
+      List<String> tmpData = [
+        element.date,
+        element.name,
+        element.qty.toString()
+      ];
+      data.add(tmpData);
+    }
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) => pw.Column(
+          mainAxisAlignment: pw.MainAxisAlignment.start,
+          crossAxisAlignment: pw.CrossAxisAlignment.center,
+          children: [
+            pw.Center(
+              child: pw.Text(
+                  'Laporan Bahan Baku Masuk Periode ${_textDateStartController.text} - ${_textDateEndController.text}'),
+            ),
+            pw.SizedBox(height: 20),
+            pw.Table.fromTextArray(
+              data: data,
+              headers: headers,
+              border: pw.TableBorder.all(),
+              cellAlignment: pw.Alignment.center,
+            )
+          ],
+        ),
+      ),
+    );
+
+    final output = await getExternalStorageDirectory();
+    String fileName =
+        DateFormat("yyyyMMddHHmmss").format(DateTime.now()).toString();
+    final file = File("${output!.path}/laporan-bahan-baku-masuk-$fileName.pdf");
+    await file.writeAsBytes(await pdf.save());
+    Fluttertoast.showToast(
+      msg: "Export PDF Berhasil",
+      toastLength: Toast.LENGTH_SHORT,
+      gravity: ToastGravity.CENTER,
+      timeInSecForIosWeb: 1,
+      backgroundColor: Colors.green,
+      textColor: Colors.white,
+      fontSize: 16.0,
+    );
+    log("PDF saved at ${file.path}");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -193,61 +266,75 @@ class _ReportMaterialInPageState extends State<ReportMaterialInPage> {
                     ],
                   ),
                   const Divider(),
-                  Expanded(child: LayoutBuilder(
-                    builder: (context, constraints) {
-                      double height = constraints.maxHeight;
-                      return RefreshIndicator(
-                        child: SizedBox(
-                          height: height,
-                          width: double.infinity,
-                          child: isLoading
-                              ? Container(
-                                  height: MediaQuery.of(context).size.height,
-                                  width: MediaQuery.of(context).size.width,
-                                  color: Colors.white,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        height: 20,
-                                        width: 20,
-                                        margin: const EdgeInsets.only(right: 5),
-                                        child: const CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.brown,
+                  Expanded(
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        double height = constraints.maxHeight;
+                        return RefreshIndicator(
+                          child: SizedBox(
+                            height: height,
+                            width: double.infinity,
+                            child: isLoading
+                                ? Container(
+                                    height: MediaQuery.of(context).size.height,
+                                    width: MediaQuery.of(context).size.width,
+                                    color: Colors.white,
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Container(
+                                          height: 20,
+                                          width: 20,
+                                          margin:
+                                              const EdgeInsets.only(right: 5),
+                                          child:
+                                              const CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.brown,
+                                          ),
                                         ),
-                                      ),
-                                      const Text(
-                                        "loading...",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Colors.brown,
-                                        ),
-                                      )
-                                    ],
+                                        const Text(
+                                          "loading...",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: Colors.brown,
+                                          ),
+                                        )
+                                      ],
+                                    ),
+                                  )
+                                : SingleChildScrollView(
+                                    physics:
+                                        const AlwaysScrollableScrollPhysics(),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: dataMaterialIn.map((e) {
+                                        return CustomCardMaterialIn(data: e);
+                                      }).toList(),
+                                    ),
                                   ),
-                                )
-                              : SingleChildScrollView(
-                                  physics:
-                                      const AlwaysScrollableScrollPhysics(),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: dataMaterialIn.map((e) {
-                                      return CustomCardMaterialIn(data: e);
-                                    }).toList(),
-                                  ),
-                                ),
-                        ),
-                        onRefresh: () async {
-                          _initPage();
-                        },
-                      );
+                          ),
+                          onRefresh: () async {
+                            _initPage();
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                  ButtonLoading(
+                    onLoading: false,
+                    text: "PDF",
+                    onTap: () {
+                      // _eventProduction();
+                      _createPdf();
                     },
-                  ))
+                  )
                 ],
               ),
             ),
