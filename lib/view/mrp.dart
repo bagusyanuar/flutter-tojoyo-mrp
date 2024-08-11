@@ -14,6 +14,7 @@ class MRPPage extends StatefulWidget {
 
 class _MRPPageState extends State<MRPPage> {
   List<ProductModel> dataProduct = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -23,10 +24,14 @@ class _MRPPageState extends State<MRPPage> {
   }
 
   void _initPage() async {
+    setState(() {
+      isLoading = true;
+    });
     ProductResponse productResponse = await getProductList();
     if (!productResponse.error) {
       setState(() {
         dataProduct = productResponse.data;
+        isLoading = false;
       });
     }
   }
@@ -69,22 +74,54 @@ class _MRPPageState extends State<MRPPage> {
                         child: SizedBox(
                           height: height,
                           width: double.infinity,
-                          child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: dataProduct.map((e) {
-                                return CustomCardMRP(
-                                  data: e,
-                                  onTap: (productModel) {
-                                    Navigator.pushNamed(context, "/mrp-detail",
-                                        arguments: productModel.id);
-                                  },
-                                );
-                              }).toList(),
-                            ),
-                          ),
+                          child: isLoading
+                              ? Container(
+                                  height: MediaQuery.of(context).size.height,
+                                  width: MediaQuery.of(context).size.width,
+                                  color: Colors.white,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Container(
+                                        height: 20,
+                                        width: 20,
+                                        margin: const EdgeInsets.only(right: 5),
+                                        child: const CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          color: Colors.brown,
+                                        ),
+                                      ),
+                                      const Text(
+                                        "loading...",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.brown,
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                )
+                              : SingleChildScrollView(
+                                  physics:
+                                      const AlwaysScrollableScrollPhysics(),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: dataProduct.map((e) {
+                                      return CustomCardMRP(
+                                        data: e,
+                                        onTap: (productModel) {
+                                          Navigator.pushNamed(
+                                              context, "/mrp-detail",
+                                              arguments: productModel.id);
+                                        },
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
                         ),
                         onRefresh: () async {
                           _initPage();

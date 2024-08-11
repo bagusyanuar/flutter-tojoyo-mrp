@@ -19,4 +19,12 @@ class MaterialModel {
       unit: e['unit'] as String,
     );
   }
+  factory MaterialModel.fromJsonProductMaterial(dynamic e) {
+    return MaterialModel(
+      id: e['material']['id'] as int,
+      name: e['material']['name'] as String,
+      qty: e['qty'] as int,
+      unit: e['material']['unit'] as String,
+    );
+  }
 }

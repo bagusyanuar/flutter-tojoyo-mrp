@@ -1,2 +1,2 @@
-const hostAddress = "http://192.168.10.10:8000";
+const hostAddress = "http://192.168.19.136:8000";
 const hostApiAddress = "$hostAddress/api";
